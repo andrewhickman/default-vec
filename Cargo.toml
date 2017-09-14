@@ -1,5 +1,5 @@
 [package]
-name = "null-vec"
+name = "default-vec"
 description = "A specialized vector that has a default value."
 documentation = "https://docs.rs/default-vec/"
 repository = "https://github.com/andrewhickman/default-vec"
