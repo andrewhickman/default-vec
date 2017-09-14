@@ -5,7 +5,7 @@ extern crate alloc;
 #[cfg(test)] mod tests;
 
 use alloc::raw_vec::RawVec;
-use std::{mem, ptr};
+use std::{fmt, mem, ops, ptr, slice};
 
 /// A vector with a default value. All uninitialized values are set to `T::default()`.
 pub struct DefaultVec<T: Default> {
@@ -15,7 +15,7 @@ pub struct DefaultVec<T: Default> {
 impl<T: Default> DefaultVec<T> {
     /// Creates an empty vector.
     pub fn new() -> Self {
-        DefaultVec { raw: RawVec::new() }
+        DefaultVec::default()
     }
 
     /// Creates an empty vector with capacity for `cap` values.
@@ -86,5 +86,35 @@ impl<T: Default> DefaultVec<T> {
             }
         }
         self.capacity()
+    }
+}
+
+impl<T: Default> Default for DefaultVec<T> {
+    fn default() -> Self {
+        DefaultVec { raw: RawVec::new() }
+    }
+}
+
+impl<T: Default> ops::Deref for DefaultVec<T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        unsafe {
+            slice::from_raw_parts(self.raw.ptr(), self.raw.cap())
+        }
+    }
+}
+
+impl<T: Default> ops::DerefMut for DefaultVec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe {
+            slice::from_raw_parts_mut(self.raw.ptr(), self.raw.cap())
+        }
+    }
+}
+
+impl<T: fmt::Debug + Default> fmt::Debug for DefaultVec<T> {
+    fn fmt<'a>(&'a self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(&**self, f)
     }
 }
