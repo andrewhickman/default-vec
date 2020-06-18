@@ -1,4 +1,4 @@
-#![feature(alloc)]
+#![feature(raw_vec_internals)]
 
 extern crate alloc;
 
@@ -20,8 +20,8 @@ impl<T: Default> DefaultVec<T> {
 
     /// Creates an empty vector with capacity for `cap` values.
     pub fn with_capacity(cap: usize) -> Self {
-        let raw = RawVec::with_capacity(cap);
-        for i in 0..raw.cap() {
+        let raw: RawVec<T> = RawVec::with_capacity(cap);
+        for i in 0..raw.capacity() {
             unsafe {
                 ptr::write(raw.ptr().offset(i as isize), T::default());
             }
@@ -31,7 +31,7 @@ impl<T: Default> DefaultVec<T> {
 
     /// Returns the total number of values the vector stores.
     pub fn capacity(&self) -> usize {
-        self.raw.cap()
+        self.raw.capacity()
     }
 
     /// Resizes the vector to contain at least `new_cap` values.
@@ -100,7 +100,7 @@ impl<T: Default> ops::Deref for DefaultVec<T> {
 
     fn deref(&self) -> &Self::Target {
         unsafe {
-            slice::from_raw_parts(self.raw.ptr(), self.raw.cap())
+            slice::from_raw_parts(self.raw.ptr(), self.raw.capacity())
         }
     }
 }
@@ -108,7 +108,7 @@ impl<T: Default> ops::Deref for DefaultVec<T> {
 impl<T: Default> ops::DerefMut for DefaultVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe {
-            slice::from_raw_parts_mut(self.raw.ptr(), self.raw.cap())
+            slice::from_raw_parts_mut(self.raw.ptr(), self.raw.capacity())
         }
     }
 }
