@@ -2,7 +2,8 @@
 
 extern crate alloc;
 
-#[cfg(test)] mod tests;
+#[cfg(test)]
+mod tests;
 
 use alloc::raw_vec::RawVec;
 use std::{fmt, mem, ops, ptr, slice};
@@ -48,9 +49,7 @@ impl<T: Default> DefaultVec<T> {
     /// Get a reference to the value in position `idx`, panicking if the index is out of bounds.
     pub fn get(&self, idx: usize) -> &T {
         assert!(idx < self.capacity());
-        unsafe {
-            &*self.raw.ptr().add(idx)
-        }
+        unsafe { &*self.raw.ptr().add(idx) }
     }
 
     /// Get a reference to the value in position `idx`, resizing if the index is out of bounds.
@@ -58,9 +57,7 @@ impl<T: Default> DefaultVec<T> {
         if idx >= self.capacity() {
             self.resize(idx + 1);
         }
-        unsafe {
-            &mut *self.raw.ptr().add(idx)
-        }
+        unsafe { &mut *self.raw.ptr().add(idx) }
     }
 
     /// Inserts a value into the vector, returning the old value.
@@ -99,17 +96,13 @@ impl<T: Default> ops::Deref for DefaultVec<T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
-        unsafe {
-            slice::from_raw_parts(self.raw.ptr(), self.raw.capacity())
-        }
+        unsafe { slice::from_raw_parts(self.raw.ptr(), self.raw.capacity()) }
     }
 }
 
 impl<T: Default> ops::DerefMut for DefaultVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe {
-            slice::from_raw_parts_mut(self.raw.ptr(), self.raw.capacity())
-        }
+        unsafe { slice::from_raw_parts_mut(self.raw.ptr(), self.raw.capacity()) }
     }
 }
 
