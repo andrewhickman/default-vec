@@ -23,7 +23,7 @@ impl<T: Default> DefaultVec<T> {
         let raw: RawVec<T> = RawVec::with_capacity(cap);
         for i in 0..raw.capacity() {
             unsafe {
-                ptr::write(raw.ptr().offset(i as isize), T::default());
+                ptr::write(raw.ptr().add(i), T::default());
             }
         }
         DefaultVec { raw }
@@ -40,7 +40,7 @@ impl<T: Default> DefaultVec<T> {
         self.raw.reserve(old_cap, new_cap.saturating_sub(old_cap));
         for i in old_cap..self.capacity() {
             unsafe {
-                ptr::write(self.raw.ptr().offset(i as isize), T::default());
+                ptr::write(self.raw.ptr().add(i), T::default());
             }
         }
     }
@@ -49,7 +49,7 @@ impl<T: Default> DefaultVec<T> {
     pub fn get(&self, idx: usize) -> &T {
         assert!(idx < self.capacity());
         unsafe {
-            &*self.raw.ptr().offset(idx as isize)
+            &*self.raw.ptr().add(idx)
         }
     }
 
@@ -59,7 +59,7 @@ impl<T: Default> DefaultVec<T> {
             self.resize(idx + 1);
         }
         unsafe {
-            &mut *self.raw.ptr().offset(idx as isize)
+            &mut *self.raw.ptr().add(idx)
         }
     }
 
@@ -71,7 +71,7 @@ impl<T: Default> DefaultVec<T> {
     /// Removes a value from the vector.
     pub fn remove(&mut self, idx: usize) -> T {
         if idx < self.capacity() {
-            mem::replace(self.get_mut(idx), T::default())
+            std::mem::take(self.get_mut(idx))
         } else {
             T::default()
         }
